@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/commenlib/commenlib.iml" filepath="$PROJECT_DIR$/commenlib/commenlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/gameproject/gameproject.iml" filepath="$PROJECT_DIR$/gameproject/gameproject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mediamodel/mediamodel.iml" filepath="$PROJECT_DIR$/mediamodel/mediamodel.iml" />
       <module fileurl="file://$PROJECT_DIR$/ounews/ounews.iml" filepath="$PROJECT_DIR$/ounews/ounews.iml" />
       <module fileurl="file://$PROJECT_DIR$/testdemo/testdemo.iml" filepath="$PROJECT_DIR$/testdemo/testdemo.iml" />
     </modules>

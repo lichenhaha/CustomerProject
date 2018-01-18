@@ -1,1 +1,1 @@
-include ':app', ':commenlib', ':testdemo', ':ounews', ':gameproject'
+include ':app', ':commenlib', ':testdemo', ':ounews', ':gameproject', ':mediamodel'
