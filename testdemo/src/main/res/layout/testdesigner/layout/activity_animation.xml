@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button android:id="@+id/btn_animation1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:text="scale"/>
+        <Button android:id="@+id/btn_animation2"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:text="trans"/>
+        <Button android:id="@+id/btn_animation3"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:text="rotate"/>
+        <Button android:id="@+id/btn_animation4"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:text="alpha"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="#ff00ff"
+        android:text="hello_world"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"/>
+
+    <com.chenli.animation.MyTextView
+        android:id="@+id/mytv"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="#ff00ff"
+        android:text="hello_world"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"/>
+
+    <com.chenli.animation.MyPointView
+        android:id="@+id/mypointview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
