@@ -8,6 +8,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.chenli.gameproject.gl.GlSurface;
+import com.chenli.gameproject.gl.GlSurface2;
 
 
 /**
@@ -15,7 +16,7 @@ import com.chenli.gameproject.gl.GlSurface;
  */
 
 public class SurfaceViewActivity extends AppCompatActivity {
-    private GlSurface myGLSurfaceView;
+    private GlSurface2 myGLSurfaceView;
 
 //    private MyGLSurfaceView myGLSurfaceView;
 
@@ -31,7 +32,7 @@ public class SurfaceViewActivity extends AppCompatActivity {
 
         //myGLSurfaceView = new MyGLSurfaceView(this);
 
-        myGLSurfaceView = new GlSurface(this);
+        myGLSurfaceView = new GlSurface2(this);
         setContentView(myGLSurfaceView);
 
     }
