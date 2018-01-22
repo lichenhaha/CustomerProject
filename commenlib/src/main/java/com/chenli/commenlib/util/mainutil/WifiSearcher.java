@@ -74,7 +74,7 @@ public class WifiSearcher {
                 mLock.unlock();
                 mContext.unregisterReceiver(mWifiReceiver);
             }
-        });
+        }).start();
     }
 
     protected class WiFiScanReceiver extends BroadcastReceiver{

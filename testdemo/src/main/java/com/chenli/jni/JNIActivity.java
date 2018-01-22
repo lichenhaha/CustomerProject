@@ -10,6 +10,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chenli.commenlib.jni.JNICall;
+import com.chenli.commenlib.jni.Native;
 import com.chenli.commenlib.jni.Person;
 import com.chenli.commenlib.util.mainutil.LogUtils;
 import com.chenli.testmvp.R;
@@ -90,6 +92,11 @@ public class JNIActivity extends AppCompatActivity {
 
     private Context context;
 
+
+
+    Native aNative = null;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,28 +107,33 @@ public class JNIActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //LogUtils.e("hangce",JNICall.getStringFromJNI());
+                //JNICall jniCall = new JNICall();
+                //jniCall.test();
+                //JNICall.getStringFromJNI();
 
-                //throw new RuntimeException("自定义异常：这是自己抛出的异常");
-
-                //LogUtils.e("hangce", "getIntArrayFromJNI ============= " + JNICall.getIntArrayFromJNI()[0] + "," + JNICall.getIntArrayFromJNI()[1]);
-
-
+                JNICall call = new JNICall();
+                String path = Environment.getExternalStorageDirectory().getPath() + "/input.mp4";
+                call.getMediaInfo(path);
 
             }
         });
 
+
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JNICall.setPersonToJNI(new Person(18, "jobs"));
+                //JNICall.setPersonToJNI(new Person(18, "jobs"));
+                aNative = new Native();
+                aNative.nativeInitilize();
+                aNative.nativeThreadStart();
             }
         });
 
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LogUtils.e("hangce", "getPersonFromJNI ============= " + JNICall.getPersonFromJNI().getAge()+ "," + JNICall.getPersonFromJNI().getName());
+                //LogUtils.e("hangce", "getPersonFromJNI ============= " + JNICall.getPersonFromJNI().getAge()+ "," + JNICall.getPersonFromJNI().getName());
+                aNative.nativeThreadStop();
             }
         });
 

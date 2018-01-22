@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
-add_library( native-lib SHARED  src/main/cpp/native-lib.cpp )
-add_library( test-lib SHARED  src/main/cpp/test-lib.cpp )
+add_library( native-lib SHARED
+            src/main/cpp/native-lib.cpp
+            src/main/cpp/test-lib.cpp)
 find_library( log-lib log )
 
 include_directories(libs/include)
@@ -34,9 +35,13 @@ set(DIR ../../../../libs)
 add_library(ffmpeg SHARED IMPORTED)
 set_target_properties(ffmpeg PROPERTIES IMPORTED_LOCATION  ${DIR}/armeabi/libffmpeg.so)
 
+#find_package(Threads REQUIRED)
+#target_link_libraries (commenlib ${CMAKE_THREAD_LIBS_INIT})
+
+#find_package(Threads REQUIRED)
+#target_link_libraries(test-lib.cpp Threads::Threads)
 
 target_link_libraries(
                        native-lib
-                       test-lib
                        ffmpeg
                        ${log-lib} )
