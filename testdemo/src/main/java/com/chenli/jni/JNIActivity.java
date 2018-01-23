@@ -122,10 +122,14 @@ public class JNIActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                JNICall call = new JNICall();
+                call.pauseAudioPlayer();
+
                 //JNICall.setPersonToJNI(new Person(18, "jobs"));
-                aNative = new Native();
-                aNative.nativeInitilize();
-                aNative.nativeThreadStart();
+//                aNative = new Native();
+//                aNative.nativeInitilize();
+//                aNative.nativeThreadStart();
             }
         });
 
@@ -133,14 +137,19 @@ public class JNIActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //LogUtils.e("hangce", "getPersonFromJNI ============= " + JNICall.getPersonFromJNI().getAge()+ "," + JNICall.getPersonFromJNI().getName());
-                aNative.nativeThreadStop();
+                //aNative.nativeThreadStop();
+
+                JNICall call = new JNICall();
+                call.stopAudioPlayer();
             }
         });
 
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                delaJavaPicture1();
+                //delaJavaPicture1();
+                JNICall call = new JNICall();
+                call.startAudioPlayer();
             }
         });
 

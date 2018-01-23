@@ -2,6 +2,7 @@
 #include "android/log.h"
 #include <iostream>
 #include <unistd.h>
+#include <pthread.h>
 
 using namespace std;
 
@@ -13,6 +14,118 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavfilter/avfilter.h>
+
+
+//char *srcPath = NULL;
+static volatile int globelFlag = -1 ;
+
+static volatile  int num = 0 ;
+
+JavaVM *javaVM;
+jobject *javaObj;
+pthread_t thread_Id ;
+
+
+void* native_thread_start(void* args){
+
+//    av_register_all();
+//    AVFormatContext *ic = avformat_alloc_context();
+//    //只读取文件头，并不会填充流信息
+//    if (avformat_open_input(&ic, srcPath, NULL, NULL) != 0){
+//        LOGE("could not open source %s", srcPath);
+//        return NULL;
+//    }
+//    if(avformat_find_stream_info(ic,NULL) < 0){
+//        LOGE("could not find stream information");
+//        return NULL;
+//    }
+//
+//    int audioStream = -1;
+//    //int videoStream = -1;
+//
+//    for (int i = 0; i < ic->nb_streams; ++i) {
+////        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO && videoStream<0){
+////            videoStream = i;
+////        }
+//        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO & audioStream<0){
+//            audioStream = i;
+//            break;
+//        }
+//    }
+////    if (videoStream == -1){
+////        return;
+////    }
+//
+//    if (audioStream == -1){
+//        return NULL;
+//    }
+//    AVCodecContext* pCodecCtx = ic->streams[audioStream]->codec;
+//    AVCodec* pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+//    if(pCodec == NULL){
+//        LOGE("unsuported codec\n");
+//        return NULL;
+//    }
+//    if (avcodec_open2(pCodecCtx,pCodec,NULL) < 0){
+//        LOGE("不能打开编解码器");
+//        return NULL;
+//    }
+//    AVFrame *avFrame = av_frame_alloc();
+//    if (avFrame == NULL){
+//        return NULL;
+//    }
+//    int ret;
+//    int got_frame = 0 ;
+//    AVPacket packet;
+//    globelFlag = 1;//播放
+//
+//    while (av_read_frame(ic,&packet) >= 0 && globelFlag == 1){
+//        if (packet.stream_index == audioStream){
+//            ret = avcodec_decode_audio4(pCodecCtx,avFrame,&got_frame,&packet);
+//            if (ret > 0 && got_frame){
+//                int size = av_samples_get_buffer_size(avFrame->linesize,avFrame->channels,
+//                                                      avFrame->nb_samples,pCodecCtx->sample_fmt,0);
+//                LOGE("audioDecodec : %d", size);
+//            }
+//        }
+
+        LOGE("*************************");
+
+        while (globelFlag == 1){
+            LOGE("+++++++ %d +++++++", num);
+            usleep(100000);//睡100毫秒
+            num++;
+            while (globelFlag != 1){
+                if (globelFlag == 2){
+                    //暂停
+                    sleep(1000);//睡觉2秒
+                } else if (globelFlag == 0){
+                    //停止
+                    break;
+                }
+            }
+
+        }
+//
+//        usleep(100000);//睡100毫秒
+//
+//        while (globelFlag != 1){
+//            if (globelFlag == 2){
+//                //暂停
+//                sleep(1000);//睡觉2秒
+//            } else if (globelFlag == 0){
+//                //停止
+//                break;
+//            }
+//        }
+//        av_free_packet(&packet);
+//    }
+//
+//    av_frame_free(&avFrame);
+//    avcodec_close(pCodecCtx);
+//    avformat_close_input(&ic);
+
+}
+
 
 void callJavaShowProgress(JNIEnv *env, jobject obj , char* message){
     jclass clazz = env->GetObjectClass(obj);
@@ -170,78 +283,54 @@ Java_com_chenli_commenlib_jni_JNICall_getstringFilterInfo(JNIEnv *env, jclass ty
 }
 
 
+
 JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_JNICall_getMediaInfo(JNIEnv *env, jobject instance,
                                                    jstring srcPath_) {
     const char *srcPath = env->GetStringUTFChars(srcPath_, 0);
-    av_register_all();
-    AVFormatContext *ic = avformat_alloc_context();
-    if (avformat_open_input(&ic, srcPath, NULL, NULL) != 0){
-        LOGE("could not open source %s", srcPath);
-        return;
-    }
-    if(avformat_find_stream_info(ic,NULL) < 0){
-        LOGE("could not find stream information");
-        return;
-    }
-
-    int videoStream = -1;
-    int audioStream = -1;
-    for (int i = 0; i < ic->nb_streams; ++i) {
-        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO){
-            videoStream = i;
-            break;
-        }
-    }
-    if (videoStream == -1){
-        return;
-    }
-    AVCodecContext* pCodecCtx = ic->streams[videoStream]->codec;
-    AVStream *stream = ic->streams[videoStream];
-
-    LOGE("----------------------dumping stream info-------------------");
-    LOGE("input frmat :%s", ic->iformat->name);
-    LOGE("nb_stream :%d", ic->nb_streams);
-    LOGE("start_time: %lld", ic->start_time/AV_TIME_BASE);
-    LOGE("duration :%lld s",ic->duration/AV_TIME_BASE);
-
-    LOGE("video nb_frames : %lld", stream->nb_frames);
-    LOGE("video codec_id: %d", pCodecCtx->codec_id);
-    LOGE("video codec_name %s",avcodec_get_name(pCodecCtx->codec_id));
-    LOGE("video width x height: %d x %d", pCodecCtx->width, pCodecCtx->height);
-    LOGE("video pix_fmt:%d",pCodecCtx->pix_fmt);
-    LOGE("video bitrate %lld kb/s", pCodecCtx->bit_rate/1000);
-    LOGE("video avg_frame_rate : %d fps",
-         stream->avg_frame_rate.num/stream->avg_frame_rate.den);
-
-
-    for (int i = 0; i < ic->nb_streams; ++i) {
-        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO){
-            audioStream = i;
-            break;
-        }
-    }
-
-    if (audioStream == -1){
-        return;
-    }
-    AVStream *audio_stream = ic->streams[audioStream];
-    AVCodecContext *audioCtx = ic->streams[audioStream]->codec;
-    LOGE("audio codec_id %d",audio_stream->codec->codec_id);
-    LOGE("audio codec_name %s", avcodec_get_name(audioCtx->codec_id));
-    LOGE("audio sample_rate :%d ",audioCtx->sample_rate);
-    LOGE("audio channels %d", audioCtx->channels);
-    LOGE("audio channels_layout &d" , audioCtx->channel_layout);
-    LOGE("audio sample_fmt %d", audioCtx->sample_fmt);
-    LOGE("audio frame_size %d", audioCtx->frame_size);
-    LOGE("audio nb_frames &lld", audio_stream->nb_frames);
-    LOGE("audio bitrate %lld kb/s", audioCtx->bit_rate/1000);
-
-    LOGE("--------------------end------------------------");
-    avformat_close_input(&ic);
-
-    env->ReleaseStringUTFChars(srcPath_, srcPath);
+    env->ReleaseStringUTFChars(srcPath_,srcPath);
 }
 
+JNIEXPORT void JNICALL
+Java_com_chenli_commenlib_jni_JNICall_setDataSource(JNIEnv *env, jobject instance,
+                                                    jstring srcPath_) {
+    const char* ch = env->GetStringUTFChars(srcPath_, 0);
+//    int len = strlen(ch);
+//    memcpy(srcPath, ch, len);//复制字符串
+//    env->GetJavaVM(&gJavaVM);
+//    gJavaObj = (jobject *) env->NewGlobalRef(instance);
+    env->ReleaseStringUTFChars(srcPath_, ch);
+}
+
+JNIEXPORT void JNICALL
+Java_com_chenli_commenlib_jni_JNICall_pauseAudioPlayer(JNIEnv *env, jobject instance) {
+    globelFlag = 2;
+    LOGE("pause");
+}
+
+JNIEXPORT void JNICALL
+Java_com_chenli_commenlib_jni_JNICall_stopAudioPlayer(JNIEnv *env, jobject instance) {
+    globelFlag = 0;
+    LOGE("stop");
+    pthread_join(thread_Id,NULL);
+}
+
+
+JNIEXPORT void JNICALL
+Java_com_chenli_commenlib_jni_JNICall_startAudioPlayer(JNIEnv *env, jobject instance) {
+
+    if (globelFlag == 2){
+        globelFlag = 1;
+    } else if (globelFlag == 0 | globelFlag == -1){
+        globelFlag = 1;
+        if (pthread_create(&thread_Id,NULL,native_thread_start,NULL) != 0){
+            return;
+        }
+        LOGE("native_thread_start success");
+    } else{
+        globelFlag = 1;
+    }
+
+}
 
 }

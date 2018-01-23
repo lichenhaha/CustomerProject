@@ -56,7 +56,6 @@ public class Triangle3 {
     private final ShortBuffer mIndexBuffer;
 
     public Triangle3(Context context){
-
         ByteBuffer bb = ByteBuffer.allocateDirect(triangleCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
         mVertexBuffer = bb.asFloatBuffer();
@@ -80,10 +79,6 @@ public class Triangle3 {
         mProgram = ShaderUtils.createProgram(s, s1);
 
     }
-
-
-
-
 
     public void drawSelf(){
         GLES20.glUseProgram(mProgram);

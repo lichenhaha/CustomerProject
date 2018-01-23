@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.chenli.commenlib.Media.MediaExtrAndMuxer;
+import com.chenli.commenlib.util.mainutil.LogUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,9 +27,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String srcPaht = Environment.getExternalStorageDirectory() + "/input.mp4";
-                String desPaht = Environment.getExternalStorageDirectory() + "/output.mp4";
+                String desPath = Environment.getExternalStorageDirectory() + "/output.aac";
                 MediaExtrAndMuxer mediaExtrAndMuxer = new MediaExtrAndMuxer();
-                mediaExtrAndMuxer.setSourceData(srcPaht,desPaht);
+                mediaExtrAndMuxer.getAudioFromVideo(srcPaht, desPath, new MediaExtrAndMuxer.AudioDecodeListener() {
+                    @Override
+                    public void decodeOver() {
+                        LogUtils.e("chenli","-----------------");
+                    }
+
+                    @Override
+                    public void decodeFail() {
+                        LogUtils.e("chenli","++++++++++++++++++");
+                    }
+                });
             }
         });
     }

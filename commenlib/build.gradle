@@ -17,9 +17,9 @@ android {
             ndk{
                 abiFilters "armeabi","armeabi-v7a"
             }
-            ndkBuild {
-                arguments "NDK_TOOLCHAIN_VERSION=4.9"
-            }
+//            ndkBuild {
+//                arguments "NDK_TOOLCHAIN_VERSION=4.9"
+//            }
         }
         sourceSets{
             main{

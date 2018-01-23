@@ -72,5 +72,14 @@ public class JNICall {
         LogUtils.e("chenli", builder.toString());
     }
 
+    public native void setDataSource(String srcPath);
+    public native void pauseAudioPlayer();
+    public native void stopAudioPlayer();
+    public native void startAudioPlayer();
+
+
+
+
+
 
 }
