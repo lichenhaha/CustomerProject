@@ -23,9 +23,6 @@ static volatile int gIsThreadExit = 0;
 
 #define TEST_BUFFER_SIZE 128
 
-
-
-
 JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_JNICall_nativeSetBuffer1(JNIEnv *env, jobject instance,
                                                        jbyteArray buffer_, jint len) {
@@ -66,46 +63,66 @@ Java_com_chenli_commenlib_jni_JNICall_nativeGetByteArray(JNIEnv *env, jobject in
 
 JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_Native_nativeInitilize(JNIEnv *env, jobject instance) {
-    env->GetJavaVM(&gJavaVM);
-    gJavaObj = (jobject *) env->NewGlobalRef(instance);
+//    env->GetJavaVM(&gJavaVM);
+//    gJavaObj = (jobject *) env->NewGlobalRef(instance);
 }
 
 void* native_thread_exec(void* arg){
-    JNIEnv *ent;
-    gJavaVM->AttachCurrentThread(&ent,NULL);
-    jclass javaClass = ent->GetObjectClass((jobject) gJavaObj);
-    if (javaClass == NULL){
-        //LOGE("Fail to find javaClass");
-        return 0;
-    }
-
-    jmethodID  methodID = ent->GetMethodID(javaClass,"onNativeCallback","(I)V");
+//    JNIEnv *ent;
+//    gJavaVM->AttachCurrentThread(&ent,NULL);
+//    jclass javaClass = ent->GetObjectClass((jobject) gJavaObj);
+//    if (javaClass == NULL){
+//        //LOGE("Fail to find javaClass");
+//        return 0;
+//    }
+//
+//    jmethodID  methodID = ent->GetMethodID(javaClass,"onNativeCallback","(I)V");
     int count = 0;
-    while (!gIsThreadExit){
-        ent->CallVoidMethod((jobject) gJavaObj, methodID,count++);
+    while (gIsThreadExit != 0){
+        //ent->CallVoidMethod((jobject) gJavaObj, methodID,count++);
+        LOGE("----------------%d--------------------", count);
         sleep(1);
-    }
-    gJavaVM->DetachCurrentThread();
-    LOGE("native_thread_exec loop leave");
 
+        while (gIsThreadExit != 1){
+            if (gIsThreadExit == 2){
+                sleep(1);
+            } else{
+                break;
+            }
+        }
+
+    }
+//    gJavaVM->DetachCurrentThread();
+
+    //必须调用否则出现anr异常，线程无法结束，android界面无法响应其他事件，通道被占用。
+    pthread_exit(0);
+    LOGE("native_thread_exec loop leave");
 }
 
 JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_Native_nativeThreadStart(JNIEnv *env, jobject instance) {
-    gIsThreadExit = 0 ;
-    pthread_t  threadId ;
-    if (pthread_create(&threadId,NULL,native_thread_exec,NULL) != 0){
-        //LOGE("native_thread_start pthread_create fail");
-        return;
-    }
-    //pthread_join(threadId,NULL);
-    LOGI("native_thread_start success");
+   if (gIsThreadExit == 0){
+       gIsThreadExit = 1 ;
+       pthread_t  threadId ;
+       if (pthread_create(&threadId,NULL,native_thread_exec,NULL) != 0){
+           return;
+       }
+       LOGI("native_thread_start success");
+   } else if (gIsThreadExit == 2){
+       gIsThreadExit = 1;
+   }
+}
+
+JNIEXPORT void JNICALL
+Java_com_chenli_commenlib_jni_Native_nativeThreadPause(JNIEnv *env, jobject instance) {
+    gIsThreadExit = 2;
+    // TODO
 
 }
 
 JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_Native_nativeThreadStop(JNIEnv *env, jobject instance) {
-    gIsThreadExit = 1 ;
+    gIsThreadExit = 0 ;
     LOGE("native_thread_stop success");
 }
 

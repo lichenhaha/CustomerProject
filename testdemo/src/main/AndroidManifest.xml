@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.chenli.jni.JNIActivity">
+        <activity android:name="com.chenli.media.GifActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

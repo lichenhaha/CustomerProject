@@ -8,7 +8,6 @@ using namespace std;
 
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "chenli", __VA_ARGS__)
 
-
 extern "C" {
 
 #include <libavcodec/avcodec.h>
@@ -16,113 +15,127 @@ extern "C" {
 #include <libavfilter/avfilter.h>
 
 
-//char *srcPath = NULL;
+char srcPath[256] = {0};
 static volatile int globelFlag = -1 ;
 
 static volatile  int num = 0 ;
 
-JavaVM *javaVM;
-jobject *javaObj;
-pthread_t thread_Id ;
+//JavaVM *javaVM;
+//jobject *javaObj;
+
 
 
 void* native_thread_start(void* args){
 
-//    av_register_all();
-//    AVFormatContext *ic = avformat_alloc_context();
-//    //只读取文件头，并不会填充流信息
-//    if (avformat_open_input(&ic, srcPath, NULL, NULL) != 0){
-//        LOGE("could not open source %s", srcPath);
-//        return NULL;
-//    }
-//    if(avformat_find_stream_info(ic,NULL) < 0){
-//        LOGE("could not find stream information");
-//        return NULL;
-//    }
-//
-//    int audioStream = -1;
-//    //int videoStream = -1;
-//
-//    for (int i = 0; i < ic->nb_streams; ++i) {
-////        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO && videoStream<0){
-////            videoStream = i;
-////        }
-//        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO & audioStream<0){
-//            audioStream = i;
-//            break;
+    av_register_all();
+    AVFormatContext *ic = avformat_alloc_context();
+    //只读取文件头，并不会填充流信息
+    if (avformat_open_input(&ic, srcPath, NULL, NULL) != 0){
+        LOGE("could not open source %s", srcPath);
+        return NULL;
+    }
+    if(avformat_find_stream_info(ic,NULL) < 0){
+        LOGE("could not find stream information");
+        return NULL;
+    }
+
+    int audioStream = -1;
+    //int videoStream = -1;
+
+    for (int i = 0; i < ic->nb_streams; ++i) {
+//        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO && videoStream<0){
+//            videoStream = i;
 //        }
-//    }
-////    if (videoStream == -1){
-////        return;
-////    }
-//
-//    if (audioStream == -1){
-//        return NULL;
-//    }
-//    AVCodecContext* pCodecCtx = ic->streams[audioStream]->codec;
-//    AVCodec* pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
-//    if(pCodec == NULL){
-//        LOGE("unsuported codec\n");
-//        return NULL;
-//    }
-//    if (avcodec_open2(pCodecCtx,pCodec,NULL) < 0){
-//        LOGE("不能打开编解码器");
-//        return NULL;
-//    }
-//    AVFrame *avFrame = av_frame_alloc();
-//    if (avFrame == NULL){
-//        return NULL;
-//    }
-//    int ret;
-//    int got_frame = 0 ;
-//    AVPacket packet;
-//    globelFlag = 1;//播放
-//
-//    while (av_read_frame(ic,&packet) >= 0 && globelFlag == 1){
-//        if (packet.stream_index == audioStream){
-//            ret = avcodec_decode_audio4(pCodecCtx,avFrame,&got_frame,&packet);
-//            if (ret > 0 && got_frame){
-//                int size = av_samples_get_buffer_size(avFrame->linesize,avFrame->channels,
-//                                                      avFrame->nb_samples,pCodecCtx->sample_fmt,0);
-//                LOGE("audioDecodec : %d", size);
-//            }
-//        }
-
-        LOGE("*************************");
-
-        while (globelFlag == 1){
-            LOGE("+++++++ %d +++++++", num);
-            usleep(100000);//睡100毫秒
-            num++;
-            while (globelFlag != 1){
-                if (globelFlag == 2){
-                    //暂停
-                    sleep(1000);//睡觉2秒
-                } else if (globelFlag == 0){
-                    //停止
-                    break;
-                }
-            }
-
+        if (ic->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO & audioStream<0){
+            audioStream = i;
+            break;
         }
-//
-//        usleep(100000);//睡100毫秒
-//
+    }
+//    if (videoStream == -1){
+//        return;
+//    }
+
+    if (audioStream == -1){
+        return NULL;
+    }
+    AVCodecContext* pCodecCtx = ic->streams[audioStream]->codec;
+    AVCodec* pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+    if(pCodec == NULL){
+        LOGE("unsuported codec\n");
+        return NULL;
+    }
+    if (avcodec_open2(pCodecCtx,pCodec,NULL) < 0){
+        LOGE("不能打开编解码器");
+        return NULL;
+    }
+    AVFrame *avFrame = av_frame_alloc();
+    if (avFrame == NULL){
+        return NULL;
+    }
+    int ret;
+    int got_frame = 0 ;
+    AVPacket packet;
+    globelFlag = 1;//播放
+
+    while (av_read_frame(ic,&packet) >= 0){
+        if (packet.stream_index == audioStream){
+            ret = avcodec_decode_audio4(pCodecCtx,avFrame,&got_frame,&packet);
+            if (ret > 0 && got_frame){
+                int size = av_samples_get_buffer_size(avFrame->linesize,avFrame->channels,
+                                                      avFrame->nb_samples,pCodecCtx->sample_fmt,0);
+                LOGE("audioDecodec : %d", size);
+            }
+        }
+
+        usleep(500000);//睡100毫秒
+
+        if (globelFlag == 0 || globelFlag == -1){
+            break;
+        }
+
+        while (globelFlag != 1){
+            if (globelFlag == 2){
+                //暂停
+                sleep(1);//睡觉2秒
+            } else if (globelFlag == 0){
+                //停止
+                break;
+            }
+        }
+        av_free_packet(&packet);
+    }
+
+    av_frame_free(&avFrame);
+    avcodec_close(pCodecCtx);
+    avformat_close_input(&ic);
+
+    //退出线程
+    pthread_exit(0);
+
+
+//    while (globelFlag != -1){
+//        usleep(200000);//睡100毫秒
+//        LOGE("--------------- %d -----------",num++);
 //        while (globelFlag != 1){
 //            if (globelFlag == 2){
 //                //暂停
-//                sleep(1000);//睡觉2秒
+//                sleep(1);//睡觉2秒
 //            } else if (globelFlag == 0){
 //                //停止
+//                globelFlag = -1;
 //                break;
 //            }
 //        }
-//        av_free_packet(&packet);
+//    }
+
+//    while (globelFlag == 1){
+//        usleep(500000);//睡100毫秒
+//        LOGE("--------------- %d -----------",num++);
 //    }
 //
-//    av_frame_free(&avFrame);
-//    avcodec_close(pCodecCtx);
-//    avformat_close_input(&ic);
+//    LOGE("----------end-------------");
+//    //javaVM->DetachCurrentThread();
+//    pthread_detach(pthread_self());
 
 }
 
@@ -295,10 +308,14 @@ JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_JNICall_setDataSource(JNIEnv *env, jobject instance,
                                                     jstring srcPath_) {
     const char* ch = env->GetStringUTFChars(srcPath_, 0);
-//    int len = strlen(ch);
-//    memcpy(srcPath, ch, len);//复制字符串
-//    env->GetJavaVM(&gJavaVM);
-//    gJavaObj = (jobject *) env->NewGlobalRef(instance);
+    int len = strlen(ch);
+
+    memcpy(srcPath, ch, len);//复制字符串
+    LOGE("++++++ memcpy  len = %d , %s , %s +++++++" , len,ch,srcPath);
+
+
+//    env->GetJavaVM(&javaVM);
+//    javaObj = (jobject *) env->NewGlobalRef(instance);
     env->ReleaseStringUTFChars(srcPath_, ch);
 }
 
@@ -312,17 +329,18 @@ JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_JNICall_stopAudioPlayer(JNIEnv *env, jobject instance) {
     globelFlag = 0;
     LOGE("stop");
-    pthread_join(thread_Id,NULL);
+
 }
 
 
 JNIEXPORT void JNICALL
 Java_com_chenli_commenlib_jni_JNICall_startAudioPlayer(JNIEnv *env, jobject instance) {
-
     if (globelFlag == 2){
         globelFlag = 1;
-    } else if (globelFlag == 0 | globelFlag == -1){
+        LOGE("+++++从pause到start++++");
+    } else if (globelFlag == 0 || globelFlag == -1){
         globelFlag = 1;
+        pthread_t  thread_Id;
         if (pthread_create(&thread_Id,NULL,native_thread_start,NULL) != 0){
             return;
         }

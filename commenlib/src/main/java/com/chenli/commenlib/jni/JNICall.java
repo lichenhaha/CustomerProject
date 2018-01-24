@@ -60,7 +60,6 @@ public class JNICall {
         byte[] buffer = nativeGetByteArray();
         printBuffer("nativeGetByteArray",buffer);
 
-
     }
 
     private void printBuffer(String tag, byte[] mTestBuffer) {

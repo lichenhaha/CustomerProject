@@ -31,6 +31,8 @@ import com.chenli.commenlib.jni.Person;
 import com.chenli.commenlib.util.mainutil.LogUtils;
 import com.chenli.testmvp.R;
 
+import java.util.Calendar;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -92,10 +94,8 @@ public class JNIActivity extends AppCompatActivity {
 
     private Context context;
 
-
-
     Native aNative = null;
-
+    private JNICall call;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,12 +118,10 @@ public class JNIActivity extends AppCompatActivity {
             }
         });
 
-
+        call = new JNICall();
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                JNICall call = new JNICall();
                 call.pauseAudioPlayer();
 
                 //JNICall.setPersonToJNI(new Person(18, "jobs"));
@@ -137,9 +135,8 @@ public class JNIActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //LogUtils.e("hangce", "getPersonFromJNI ============= " + JNICall.getPersonFromJNI().getAge()+ "," + JNICall.getPersonFromJNI().getName());
-                //aNative.nativeThreadStop();
+//                aNative.nativeThreadStop();
 
-                JNICall call = new JNICall();
                 call.stopAudioPlayer();
             }
         });
@@ -148,7 +145,11 @@ public class JNIActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //delaJavaPicture1();
-                JNICall call = new JNICall();
+
+//                aNative.nativeThreadPause();
+                call = new JNICall();
+                String path = Environment.getExternalStorageDirectory().getPath() + "/input.mp4";
+                call.setDataSource(path);
                 call.startAudioPlayer();
             }
         });

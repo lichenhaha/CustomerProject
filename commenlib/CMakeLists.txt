@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 add_library( native-lib SHARED
             src/main/cpp/native-lib.cpp
-            src/main/cpp/test-lib.cpp)
+            src/main/cpp/test-lib.cpp
+            src/main/cpp/opencv-lib.cpp)
 find_library( log-lib log )
 
 include_directories(libs/include)
@@ -32,8 +33,7 @@ set(DIR ../../../../libs)
 #add_library(avfilter-5 SHARED  IMPORTED)
 #set_target_properties(avfilter-5 PROPERTIES IMPORTED_LOCATION  ${DIR}/armeabi/libavfilter-5.so)
 
-add_library(ffmpeg SHARED IMPORTED)
-set_target_properties(ffmpeg PROPERTIES IMPORTED_LOCATION  ${DIR}/armeabi/libffmpeg.so)
+
 
 #find_package(Threads REQUIRED)
 #target_link_libraries (commenlib ${CMAKE_THREAD_LIBS_INIT})
@@ -41,7 +41,14 @@ set_target_properties(ffmpeg PROPERTIES IMPORTED_LOCATION  ${DIR}/armeabi/libffm
 #find_package(Threads REQUIRED)
 #target_link_libraries(test-lib.cpp Threads::Threads)
 
+add_library(ffmpeg SHARED IMPORTED)
+set_target_properties(ffmpeg PROPERTIES IMPORTED_LOCATION  ${DIR}/armeabi/libffmpeg.so)
+
+add_library(opencv_java3 SHARED IMPORTED)
+set_target_properties(opencv_java3  PROPERTIES IMPORTED_LOCATION ${DIR}/armeabi-v7a/libopencv_java3.so)
+
 target_link_libraries(
                        native-lib
+                       opencv_java3
                        ffmpeg
                        ${log-lib} )
