@@ -1,15 +1,22 @@
 package com.chenli.commenlib.util.gameutil;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.chenli.commenlib.util.mainutil.CloseUtils;
+import com.chenli.commenlib.util.mainutil.FileIOUtils;
+import com.chenli.commenlib.util.mainutil.FileUtils;
 import com.chenli.commenlib.util.mainutil.LogUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by Administrator on 2018/1/16.
@@ -82,6 +89,36 @@ public class ShaderUtils {
             throw new RuntimeException(op + ": glError " + error);
         }
     }
+
+    /**
+     * 从资源文件中读取
+     * @param context
+     * @param resourceId
+     * @return
+     */
+    public static String readTextFileFromResource(Context context,int resourceId){
+        StringBuilder body = new StringBuilder();
+        InputStream inputStream = context.getResources().openRawResource(resourceId);
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        String line;
+        try {
+            while ((line = bufferedReader.readLine()) != null){
+                body.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            bufferedReader.close();
+            inputStream.close();
+            inputStreamReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return body.toString();
+    }
+
 
     //从sh脚本中加载shader内容的方法
     public static String loadFromAssetsFile(String fname,Resources r){

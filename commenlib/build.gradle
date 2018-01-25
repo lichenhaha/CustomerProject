@@ -107,4 +107,7 @@ dependencies {
     compile 'tv.danmaku.ijk.media:ijkplayer-java:0.8.4'
     compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.4'
 
+    //加载gif动画 ,基于giflib
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.10'
+
 }
