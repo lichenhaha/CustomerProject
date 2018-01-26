@@ -24,7 +24,11 @@ public class TestSensor extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         manager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        if (manager == null){
+
+        }
         sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
     }
 
     SensorEventListener listener = new SensorEventListener() {
@@ -34,13 +38,12 @@ public class TestSensor extends AppCompatActivity{
             int y = (int) event.values[1];
             int z = (int) event.values[2];
 
-            LogUtils.e("x = " + x + " , y = " + y + " , z = " + z);
+            LogUtils.e("chenli", "x = " + x + " , y = " + y + " , z = " + z);
 
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
         }
     };
 

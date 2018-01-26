@@ -45,6 +45,19 @@ public class ShaderUtils {
         return shader;
     }
 
+    public static int compileVertexShader(String shaderSource){
+        int shader;
+        shader = loadShader(GLES20.GL_VERTEX_SHADER, shaderSource);
+        return shader;
+    }
+
+    public static int compileFragmentShader(String shaderSource){
+        int shader;
+        shader = loadShader(GLES20.GL_FRAGMENT_SHADER, shaderSource);
+        return shader;
+    }
+
+
     //创建shader程序的方法
     public static int createProgram(String vertexSource, String fragmentSource){
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
@@ -89,6 +102,26 @@ public class ShaderUtils {
             throw new RuntimeException(op + ": glError " + error);
         }
     }
+
+    public static int buildProgram(String vertexShaderSource, String fragmentShaderSource){
+        int program;
+        int vertexShader = compileVertexShader(vertexShaderSource);
+        int fragmentShader = compileFragmentShader(fragmentShaderSource);
+        program = linkProgram(vertexShader, fragmentShader);
+        return program;
+    }
+
+    private static int linkProgram(int vertexShader, int fragmentShader) {
+        int program = GLES20.glCreateProgram();
+        if (program != 0){
+            GLES20.glAttachShader(program,vertexShader);
+            GLES20.glAttachShader(program,fragmentShader);
+            GLES20.glLinkProgram(program);
+            return program;
+        }
+        return 0;
+    }
+
 
     /**
      * 从资源文件中读取

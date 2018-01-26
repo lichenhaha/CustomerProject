@@ -8,7 +8,10 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.chenli.commenlib.util.mainutil.LogUtils;
 import com.chenli.gameproject.R;
+
+import java.util.Arrays;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -41,7 +44,10 @@ public class GlSurface2 extends GLSurfaceView implements GLSurfaceView.Renderer 
         //GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         //mCube = new Cube(getContext());
 
-        airRender = new AirRender(getContext());
+//        airRender = new AirRender(getContext());
+
+        Table table = new Table();
+        Mallet mallet = new Mallet();
 
     }
 
@@ -49,40 +55,27 @@ public class GlSurface2 extends GLSurfaceView implements GLSurfaceView.Renderer 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0,0,width,height);
 
+        Matrix.perspectiveM(airRender.projectionMatrix,0,45,width*1.0f/height,1f,10f);
+        Matrix.setIdentityM(airRender.modelMatrix,0);//初始化矩阵为单位矩阵
+        Matrix.translateM(airRender.modelMatrix,0,0,0,-3f);
+        Matrix.rotateM(airRender.modelMatrix,0,-60,1f,0f,0f);
+        float[] temp = new float[16];
+        Matrix.multiplyMM(temp,0,airRender.projectionMatrix,0,airRender.modelMatrix,0);
+        System.arraycopy(temp,0,airRender.projectionMatrix,0,temp.length);
 
-
-
-//        float ratio = (float) (width*1.0/height);
-//        Matrix.frustumM(mProjectMatrix,0,-ratio,ratio, -1, 1, 3, 20);
-//        Matrix.setLookAtM(mViewMatrix,0, 5.0f, 5.0f, 10.0f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-//        Matrix.multiplyMM(mCube.mMVPMatrix,0,mProjectMatrix,0,mViewMatrix,0);
-
-//        int[] textNames = new int[1];
-//        GLES20.glGenTextures(1, textNames, 0);
-//        int textName = textNames[0];
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textName);
-//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-//                GLES20.GL_LINEAR);
-//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-//                GLES20.GL_LINEAR);
-//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
-//                GLES20.GL_REPEAT);
-//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
-//                GLES20.GL_REPEAT);
-//        bitmap.recycle();
-
-
+//        float ratio = width > height?width*1.0f/height:height*1.0f/width;
+//        if (width>height){
+//            Matrix.orthoM(airRender.projectionMatrix,0,-ratio,ratio,-1f,1f,-1f,1f);
+//        }else {
+//            Matrix.orthoM(airRender.projectionMatrix,0,-1f,1f,-ratio,ratio,-1f,1f);
+//        }
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-        //mTriangle3.drawSelf();
-        //mCircle.drawSelf();
-        //mCube.drawSelf();
 
         airRender.drawSelf();
+
     }
 }
