@@ -4,7 +4,9 @@
 #include <unistd.h>
 #include <iostream>
 #include "pthread.h"
-#include <opencv2/core.hpp>
+#include <android/bitmap.h>
+#include <opencv2/opencv.hpp>
+
 
 
 
@@ -37,6 +39,56 @@ Java_com_chenli_commenlib_jni_OpencvNative_grayPicture(JNIEnv *env, jobject inst
     env->ReleaseIntArrayElements(pixel_, pixel, 0);
     return result;
 }
+
+JNIEXPORT jintArray JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_grayPicture1(JNIEnv *env, jobject instance,
+                                                        jintArray pixel_, jint w, jint h) {
+    jint *pixel = env->GetIntArrayElements(pixel_, NULL);
+    if (pixel == NULL){
+        return 0;
+    }
+    Mat imgData(h, w, CV_8UC4,pixel);
+    Mat dstImg;
+    cvtColor(imgData,dstImg,CV_BGR2GRAY);
+
+
+    env->ReleaseIntArrayElements(pixel_, pixel, 0);
+}
+
+
+JNIEXPORT void JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_grayPicture2(JNIEnv *env, jobject instance,
+                                                        jobject bitmap_) {
+    AndroidBitmapInfo infoColor;
+    void *pixelsColor;
+    int ret;
+    if ((ret = AndroidBitmap_getInfo(env,bitmap_,&infoColor)) < 0){
+        LOGE("bitmap fail");
+        return;
+    }
+    if (infoColor.format!=ANDROID_BITMAP_FORMAT_RGBA_8888){
+        LOGE("bitmap format must RGBA_8888");
+        return;
+    }
+    if ((ret = AndroidBitmap_lockPixels(env,bitmap_,&pixelsColor)) < 0){
+        LOGE("lockPixels fail");
+    }
+    Mat test(infoColor.height,infoColor.width,CV_8UC4);
+    Mat bgra;
+    cvtColor(test,test,CV_BGRA2GRAY);
+    cvtColor(test,test,CV_GRAY2RGBA);
+    AndroidBitmap_unlockPixels(env,bitmap_);
+}
+
+JNIEXPORT jintArray JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_blurPicture(JNIEnv *env, jobject instance,
+                                                       jintArray pixel_, jint w, jint h,
+                                                       jint size) {
+    jint *pixel = env->GetIntArrayElements(pixel_, NULL);
+
+    env->ReleaseIntArrayElements(pixel_, pixel, 0);
+}
+
 
 }
 

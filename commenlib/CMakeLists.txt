@@ -47,8 +47,11 @@ set_target_properties(ffmpeg PROPERTIES IMPORTED_LOCATION  ${DIR}/armeabi/libffm
 add_library(opencv_java3 SHARED IMPORTED)
 set_target_properties(opencv_java3  PROPERTIES IMPORTED_LOCATION ${DIR}/armeabi-v7a/libopencv_java3.so)
 
+
 target_link_libraries(
+
                        native-lib
                        opencv_java3
                        ffmpeg
+                       -ljnigraphics
                        ${log-lib} )

@@ -29,7 +29,7 @@ public class WifiSearcher {
     private volatile boolean mIsWifiScanCompleted = false;
     private final Context mContext;
 
-    public static enum ErrorType {
+    public enum ErrorType {
         SEARCH_WIFI_TIMEOUT, //扫描WIFI超时（一直搜不到结果）
         NO_WIFI_FOUND,       //扫描WIFI结束，没有找到任何WIFI信号
     }
@@ -53,9 +53,11 @@ public class WifiSearcher {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                //如果WIFI没有打开，则打开WIFI
                 if (!mWifiManager.isWifiEnabled()){
                     mWifiManager.setWifiEnabled(true);
                 }
+                //注册接收WIFI扫描结果的监听类对象
                 IntentFilter intentFilter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
                 mContext.registerReceiver(mWifiReceiver,intentFilter);
                 //开始扫描
@@ -72,11 +74,13 @@ public class WifiSearcher {
                     e.printStackTrace();
                 }
                 mLock.unlock();
+                //删除注册的监听类对象
                 mContext.unregisterReceiver(mWifiReceiver);
             }
         }).start();
     }
 
+    //系统WIFI扫描结果消息的接收者
     protected class WiFiScanReceiver extends BroadcastReceiver{
 
         @Override
@@ -87,6 +91,7 @@ public class WifiSearcher {
             for (ScanResult result : scanResults){
                 ssidResults.add(result.SSID);
             }
+            //检测扫描结果
             if (ssidResults.isEmpty()){
                 mSearchWifiListener.onSearchWifiFailed(ErrorType.NO_WIFI_FOUND);
             }else {
