@@ -34,6 +34,14 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
     Button button3;
     @Bind(R.id.button4)
     Button button4;
+    @Bind(R.id.button5)
+    Button button5;
+    @Bind(R.id.button6)
+    Button button6;
+    @Bind(R.id.button7)
+    Button button7;
+    @Bind(R.id.button8)
+    Button button8;
     @Bind(R.id.imageview)
     ImageView imageView;
     @Bind(R.id.textview)
@@ -48,6 +56,10 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
         button4.setOnClickListener(this);
+        button5.setOnClickListener(this);
+        button6.setOnClickListener(this);
+        button7.setOnClickListener(this);
+        button8.setOnClickListener(this);
         imageView.setImageResource(R.mipmap.img4);
     }
 
@@ -55,7 +67,7 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         if (v.getId() == R.id.button1){
             long current = System.currentTimeMillis();
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pic);
             int w = bitmap.getWidth();
             int h = bitmap.getHeight();
             int[] pixels = new int[w*h];
@@ -69,7 +81,7 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
             textView.setText("消耗时间:" + (end-current));
         }else if (v.getId() == R.id.button2){
             long current = System.currentTimeMillis();
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pic);
             Bitmap resultImg = bitmap.copy(Bitmap.Config.ARGB_8888,true);
             Canvas canvas = new Canvas(resultImg);
             Paint paint = new Paint();
@@ -83,17 +95,54 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
             textView.setText("消耗时间:" + (end-current));
         }else if (v.getId() == R.id.button3){
             long current = System.currentTimeMillis();
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pic);
             OpencvNative.getInstance().grayPicture2(bitmap);
             imageView.setImageBitmap(bitmap);
             long end = System.currentTimeMillis();
             textView.setText("消耗时间:" + (end-current));
         }else if (v.getId() == R.id.button4){
             long current = System.currentTimeMillis();
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
-            imageView.setImageBitmap(bitmap);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pic);
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            int[] pixels = new int[w*h];
+            bitmap.getPixels(pixels,0,w,0,0,w,h);
+            int[] ints = OpencvNative.getInstance().grayPicture1(pixels, w, h);
+            Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            resultImg.setPixels(ints,0,w,0,0,w,h);
+            imageView.setImageBitmap(resultImg);
             long end = System.currentTimeMillis();
             textView.setText("消耗时间:" + (end-current));
+        }else if (v.getId() == R.id.button5){
+            long current = System.currentTimeMillis();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            int[] pixels = new int[w*h];
+            bitmap.getPixels(pixels,0,w,0,0,w,h);
+            int[] result = OpencvNative.getInstance().blurPicture(pixels, w, h, 7);
+            Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            resultImg.setPixels(result,0,w,0,0,w,h);
+            imageView.setImageBitmap(resultImg);
+            long end = System.currentTimeMillis();
+            textView.setText("消耗时间:" + (end-current));
+        }else if (v.getId() == R.id.button6){
+            long current = System.currentTimeMillis();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            int[] pixels = new int[w*h];
+            bitmap.getPixels(pixels,0,w,0,0,w,h);
+            int[] result = OpencvNative.getInstance().cannyPicture(pixels, w, h, 7);
+            Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            resultImg.setPixels(result,0,w,0,0,w,h);
+            imageView.setImageBitmap(resultImg);
+            long end = System.currentTimeMillis();
+            textView.setText("消耗时间:" + (end-current));
+        }else if (v.getId() == R.id.button7){
+
+        }else if (v.getId() == R.id.button8){
+
         }
     }
 }

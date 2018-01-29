@@ -18,6 +18,14 @@ using namespace std;
 
 extern "C"{
 
+
+typedef struct {
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+    uint8_t alpha;
+} argb;
+
 JNIEXPORT jintArray JNICALL
 Java_com_chenli_commenlib_jni_OpencvNative_grayPicture(JNIEnv *env, jobject instance,
                                                        jintArray pixel_, jint w, jint h) {
@@ -50,9 +58,13 @@ Java_com_chenli_commenlib_jni_OpencvNative_grayPicture1(JNIEnv *env, jobject ins
     Mat imgData(h, w, CV_8UC4,pixel);
     Mat dstImg;
     cvtColor(imgData,dstImg,CV_BGR2GRAY);
-
-
+    cvtColor(dstImg,dstImg,CV_GRAY2BGRA);
+    jint  *ptr = dstImg.ptr<jint>(0);
+    int size = w*h;
+    jintArray  result = env->NewIntArray(size);
+    env->SetIntArrayRegion(result,0,size,ptr);
     env->ReleaseIntArrayElements(pixel_, pixel, 0);
+    return result;
 }
 
 
@@ -73,10 +85,16 @@ Java_com_chenli_commenlib_jni_OpencvNative_grayPicture2(JNIEnv *env, jobject ins
     if ((ret = AndroidBitmap_lockPixels(env,bitmap_,&pixelsColor)) < 0){
         LOGE("lockPixels fail");
     }
-    Mat test(infoColor.height,infoColor.width,CV_8UC4);
-    Mat bgra;
-    cvtColor(test,test,CV_BGRA2GRAY);
-    cvtColor(test,test,CV_GRAY2RGBA);
+    uint8_t gray;
+    for (int i = 0; i < infoColor.height; ++i) {
+        argb *line = (argb *) pixelsColor;
+        for (int j = 0; j < infoColor.width; ++j) {
+            gray = 0.3 * line[j].red + 0.59 * line[j].green
+                   + 0.11 * line[j].blue;
+            line[j].red = line[j].green = line[j].blue = gray;
+        }
+        pixelsColor = (char*)pixelsColor + infoColor.stride;
+    }
     AndroidBitmap_unlockPixels(env,bitmap_);
 }
 
@@ -85,8 +103,37 @@ Java_com_chenli_commenlib_jni_OpencvNative_blurPicture(JNIEnv *env, jobject inst
                                                        jintArray pixel_, jint w, jint h,
                                                        jint size) {
     jint *pixel = env->GetIntArrayElements(pixel_, NULL);
-
+    Mat srcImg(h,w,CV_8UC4,pixel);
+    Mat dstImg;
+    blur(srcImg,dstImg,cv::Size(size,size));
+    jint  *ptr = dstImg.ptr<jint>(0);
+    int count = w*h;
+    jintArray  result = env->NewIntArray(count);
+    env->SetIntArrayRegion(result,0,count,ptr);
     env->ReleaseIntArrayElements(pixel_, pixel, 0);
+    return result;
+}
+
+JNIEXPORT jintArray JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_cannyPicture(JNIEnv *env, jobject instance,
+                                                        jintArray pixels_, jint w, jint h,
+                                                        jint size) {
+    jint *pixels = env->GetIntArrayElements(pixels_, NULL);
+    Mat srcImg(h,w,CV_8UC4,(uchar *)pixels);
+    Mat dstImage, edge, grayImage;
+    dstImage.create(srcImg.size(),srcImg.type());
+    cvtColor(srcImg,grayImage,CV_BGRA2GRAY,4);
+    blur(grayImage,edge,cv::Size(size,size));
+    Canny(edge,edge,3,9);
+    cvtColor(edge,edge,CV_GRAY2BGRA);
+    jint  *ptr = edge.ptr<jint>(0);
+    int count = w*h;
+    jintArray  result = env->NewIntArray(count);
+    env->SetIntArrayRegion(result,0,count,ptr);
+    env->ReleaseIntArrayElements(pixels_, pixels, 0);
+    pixels = NULL;
+    ptr = NULL;
+    return result;
 }
 
 

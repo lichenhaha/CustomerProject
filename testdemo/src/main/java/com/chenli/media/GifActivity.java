@@ -23,7 +23,6 @@ import java.io.InputStream;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import pl.droidsonroids.gif.GifImageView;
 
 /**
  * Created by Administrator on 2018/1/24.
@@ -33,21 +32,6 @@ public class GifActivity extends AppCompatActivity implements View.OnClickListen
 
     @Bind(R.id.button1)
     Button button1;
-
-    @Bind(R.id.imageview)
-    GifImageView imageview;
-
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            int frame = gifLib.updateFrame(gifLib.ndkGifPoint, bitmap);
-            handler.sendEmptyMessageDelayed(1,frame);
-            imageview.setImageBitmap(bitmap);
-        }
-    };
-
-    private GifLib gifLib;
-    private Bitmap bitmap;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

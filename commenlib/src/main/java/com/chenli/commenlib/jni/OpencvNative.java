@@ -18,6 +18,8 @@ public class OpencvNative {
         return OpencvNativeHelper.instance;
     }
 
+
+
     static class OpencvNativeHelper{
         private static OpencvNative instance = new OpencvNative();
     }
@@ -32,5 +34,7 @@ public class OpencvNative {
      * 平滑处理，滤镜效果
      */
     public native int[] blurPicture(int[] pixel, int w, int h, int size);
+
+    public native int[] cannyPicture(int[] pixels, int w, int h, int size);
 
 }
