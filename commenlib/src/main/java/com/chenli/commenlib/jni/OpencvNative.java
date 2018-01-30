@@ -18,6 +18,11 @@ public class OpencvNative {
         return OpencvNativeHelper.instance;
     }
 
+    public native int[] dataTransition(int[] pixels, int w, int h);
+
+    public native int[] filterPicture(int[] pixels, int w, int h);
+
+    public native int[] blurHalfPicture(int[] pixels, int w, int h);
 
 
     static class OpencvNativeHelper{

@@ -3,6 +3,7 @@ package com.chenli.jni;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -15,7 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chenli.commenlib.jni.OpencvNative;
+import com.chenli.commenlib.util.mainutil.LogUtils;
 import com.chenli.testmvp.R;
+
+import java.util.Arrays;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,6 +46,14 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
     Button button7;
     @Bind(R.id.button8)
     Button button8;
+    @Bind(R.id.button9)
+    Button button9;
+    @Bind(R.id.button10)
+    Button button10;
+    @Bind(R.id.button11)
+    Button button11;
+    @Bind(R.id.button12)
+    Button button12;
     @Bind(R.id.imageview)
     ImageView imageView;
     @Bind(R.id.textview)
@@ -60,6 +72,10 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
         button6.setOnClickListener(this);
         button7.setOnClickListener(this);
         button8.setOnClickListener(this);
+        button9.setOnClickListener(this);
+        button10.setOnClickListener(this);
+        button11.setOnClickListener(this);
+        button12.setOnClickListener(this);
         imageView.setImageResource(R.mipmap.img4);
     }
 
@@ -140,8 +156,51 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
             long end = System.currentTimeMillis();
             textView.setText("消耗时间:" + (end-current));
         }else if (v.getId() == R.id.button7){
-
+            Bitmap bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            for (int i = 0; i < h; i++) {
+                for (int j = 0; j < w; j++) {
+                    bitmap.setPixel(i,j, Color.parseColor("#FFFF0000"));
+                }
+            }
+            int[] pixels = new int[w*h];
+            bitmap.getPixels(pixels,0,w,0,0,w,h);
+            int[] resultData = OpencvNative.getInstance().dataTransition(pixels,w,h);
+            Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            resultImg.setPixels(resultData,0,w,0,0,w,h);
+            imageView.setImageBitmap(resultImg);
         }else if (v.getId() == R.id.button8){
+            long current = System.currentTimeMillis();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            int[] pixels = new int[w*h];
+            bitmap.getPixels(pixels,0,w,0,0,w,h);
+            OpencvNative opencvNative = OpencvNative.getInstance();
+            int[] grayPicture = opencvNative.filterPicture(pixels, w, h);
+            Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            resultImg.setPixels(grayPicture,0,w,0,0,w,h);
+            imageView.setImageBitmap(resultImg);
+            long end = System.currentTimeMillis();
+            textView.setText("消耗时间:" + (end-current));
+        }else if (v.getId() == R.id.button9){
+            long current = System.currentTimeMillis();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.img4);
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            int[] pixels = new int[w*h];
+            bitmap.getPixels(pixels,0,w,0,0,w,h);
+            OpencvNative opencvNative = OpencvNative.getInstance();
+            int[] resultData = opencvNative.blurHalfPicture(pixels,w,h);
+            Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            resultImg.setPixels(resultData,0,w,0,0,w,h);
+            imageView.setImageBitmap(resultImg);
+            long end = System.currentTimeMillis();
+            textView.setText("消耗时间:" + (end-current));
+        }else if (v.getId() == R.id.button9){
+
+        }else if (v.getId() == R.id.button9){
 
         }
     }

@@ -137,5 +137,68 @@ Java_com_chenli_commenlib_jni_OpencvNative_cannyPicture(JNIEnv *env, jobject ins
 }
 
 
+JNIEXPORT jintArray JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_dataTransition(JNIEnv *env, jobject instance,
+                                                          jintArray pixels_, jint w, jint h) {
+    jint *pixels = env->GetIntArrayElements(pixels_, NULL);
+
+    Mat mat(h,w,CV_8UC4,pixels);
+
+    LOGE("mat0 = %d " ,mat.at<Vec4b>(0,0)[0]);
+    LOGE("mat1 = %d " ,mat.at<Vec4b>(0,0)[1]);
+    LOGE("mat2 = %d " ,mat.at<Vec4b>(0,0)[2]);
+    LOGE("mat3 = %d " ,mat.at<Vec4b>(0,0)[3]);
+
+    jint *ptr = mat.ptr<jint>(0);
+    jintArray result = env->NewIntArray(w*h);
+    env->SetIntArrayRegion(result,0,w*h,ptr);
+    env->ReleaseIntArrayElements(pixels_, pixels, 0);
+    return result;
+}
+
+
+JNIEXPORT jintArray JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_filterPicture(JNIEnv *env, jobject instance,
+                                                         jintArray pixels_, jint w, jint h) {
+    jint *pixels = env->GetIntArrayElements(pixels_, NULL);
+    Mat mat(h,w,CV_8UC4,pixels);
+
+    Mat kern = Mat::zeros(3, 3, CV_8SC1);
+    kern.at<char>(0, 0) = 1;
+    kern.at<char>(0, 1) = -1;
+    kern.at<char>(0, 2) = 0;
+    kern.at<char>(1, 0) = -1;
+    kern.at<char>(1, 1) = 5;
+    kern.at<char>(1, 2) = -1;
+    kern.at<char>(2, 0) = 0;
+    kern.at<char>(2, 1) = -1;
+    kern.at<char>(2, 2) = 0;
+
+    Mat dst;
+    filter2D(mat, dst, mat.depth(),kern);
+
+    jint *ptr = dst.ptr<jint>(0);
+    int size = w*h;
+    jintArray  result = env->NewIntArray(size);
+    env->SetIntArrayRegion(result,0,size,ptr);
+    env->ReleaseIntArrayElements(pixels_, pixels, 0);
+    return result;
+}
+
+JNIEXPORT jintArray JNICALL
+Java_com_chenli_commenlib_jni_OpencvNative_blurHalfPicture(JNIEnv *env, jobject instance,
+                                                           jintArray pixels_, jint w, jint h) {
+    jint *pixels = env->GetIntArrayElements(pixels_, NULL);
+    Mat srcDada(h,w,CV_8UC4,(uchar*)pixels);
+    Mat dstData = srcDada.rowRange(0,h/3);
+    cv::GaussianBlur(dstData,dstData,cv::Size(7,7),0,0);
+    int size = w*h;
+    jintArray  result = env->NewIntArray(size);
+    env->SetIntArrayRegion(result,0, size,pixels);
+    env->ReleaseIntArrayElements(pixels_, pixels, 0);
+    return result;
+}
+
+
 }
 
