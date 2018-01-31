@@ -1,5 +1,6 @@
 package com.chenli.media;
 
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     Button button2;
     @Bind(R.id.framelayout)
     FrameLayout framelayout;
+    private CameraPreview cameraPreview;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,13 +36,21 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
 
+
+
     }
 
     @Override
     public void onClick(View v) {
-        CameraPreview cameraPreview = new CameraPreview(this);
-        framelayout.removeAllViews();
-        framelayout.addView(cameraPreview);
+        if (v.getId() == R.id.button1){
+            cameraPreview = new CameraPreview(this);
+            framelayout.removeAllViews();
+            framelayout.addView(cameraPreview);
+            framelayout.setOnClickListener(cameraPreview);
+        }else if (v.getId() == R.id.button2){
+            cameraPreview.takePicture();
+        }
+
     }
 
 }

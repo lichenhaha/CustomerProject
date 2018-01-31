@@ -1,1 +1,1 @@
-include ':app', ':commenlib', ':testdemo', ':ounews', ':gameproject', ':mediamodel', ':libgiflib'
+include ':app', ':commenlib', ':testdemo', ':ounews', ':gameproject', ':mediamodel', ':libgiflib', ':yuvlib'

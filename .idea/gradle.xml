@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/mediamodel" />
             <option value="$PROJECT_DIR$/ounews" />
             <option value="$PROJECT_DIR$/testdemo" />
+            <option value="$PROJECT_DIR$/yuvlib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
