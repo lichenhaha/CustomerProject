@@ -8,6 +8,7 @@ using namespace std;
 
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "chenli", __VA_ARGS__)
 
+
 extern "C" {
 
 #include <libavcodec/avcodec.h>

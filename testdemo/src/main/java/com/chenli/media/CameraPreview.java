@@ -2,9 +2,10 @@ package com.chenli.media;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Canvas;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Environment;
 import android.util.AttributeSet;
@@ -13,11 +14,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.chenli.yuvlib.YUVlib;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -54,10 +55,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         parameters.setRotation(90);//这句话设置了保存的图片才是旋转后的。
 
         parameters.setPictureFormat(ImageFormat.JPEG);
-        parameters.setPreviewFormat(ImageFormat.NV21);
 
-        parameters.setPictureSize(640,480);
-        parameters.setPreviewSize(720,480);
+        parameters.setPreviewFormat(ImageFormat.YV12);
+
+        parameters.setPictureSize(480,640);
+        parameters.setPreviewSize(480,640);
         //这两个属性 如果这两个属性设置的和真实手机的不一样时，就会报错
 
         if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
@@ -70,14 +72,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        //parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-
+        mCamera.autoFocus(autoFocusCallback);
         mCamera.setParameters(parameters);
-
         mCamera.setPreviewDisplay(holder);
         mCamera.startPreview();
 
-        mCamera.autoFocus(autoFocusCallback);
 
     }
 
@@ -119,22 +118,44 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         public void onAutoFocus(boolean success, Camera camera) {
             if (!flag && success){
                 flag  = true;
-                Log.e(TAG, "onAutoFocus: -------" );
+                mCamera.setOneShotPreviewCallback(mCallback);
             }
-        }
-    };
-
-    private Camera.AutoFocusMoveCallback focusMoveCallback = new Camera.AutoFocusMoveCallback() {
-        @Override
-        public void onAutoFocusMoving(boolean start, Camera camera) {
-            Log.e(TAG, "onAutoFocusMoving: ++++++++++" );
         }
     };
 
     private Camera.PreviewCallback mCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            Log.e(TAG, "onPreviewFrame");
+            String stringFromJNI = YUVlib.getStringFromJNI();
+            Log.e(TAG, "onPreviewFrame: " + stringFromJNI);
+
+            int length = data.length;
+            Log.e(TAG, "length  " + length + " width = " + mCamera.getParameters().getPreviewSize().width + " height = " + mCamera.getParameters().getPreviewSize().height);
+
+            byte[] bytes = YUVlib.getInstance().NV21ToARGB(data, data.length, mCamera.getParameters().getPreviewSize().width, mCamera.getParameters().getPreviewSize().height);
+            try {
+                File takePicture = getTakePicture();
+                FileOutputStream fos = new FileOutputStream(takePicture);
+                Log.e(TAG, "onPreviewFrame: " + bytes.length);
+                fos.write(bytes);
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //YuvImage yuvImage = new YuvImage(data,ImageFormat.NV21,mCamera.getParameters().getPreviewSize().width,mCamera.getParameters().getPreviewSize().height,null);
+//            try {
+//                File takePicture = getTakePicture();
+//                FileOutputStream fos = new FileOutputStream(takePicture);
+//                yuvImage.compressToJpeg(new Rect(0,0,mCamera.getParameters().getPreviewSize().width,mCamera.getParameters().getPreviewSize().height),100,fos);
+//                fos.flush();
+//                fos.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
         }
     };
 
