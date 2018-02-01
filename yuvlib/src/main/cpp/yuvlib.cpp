@@ -40,4 +40,6 @@ Java_com_chenli_yuvlib_YUVlib_NV21ToARGB(JNIEnv *env,
     env->ReleaseByteArrayElements(y_, (jbyte *) y, 0);
     env->ReleaseByteArrayElements(uv_, (jbyte *) uv, 0);
     env->ReleaseByteArrayElements(argb_, (jbyte *) argb, 0);
+
+    LOGE("++++++   C++  +++++");
 }

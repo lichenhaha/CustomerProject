@@ -35,16 +35,17 @@ public class YUVlib {
         byteBuffer.position(0);
         byte[] argb = new byte[width*height];
         byte[] src_y = new byte[width*height];
-        byte[] src_uv = new byte[(width+1)/2*((height+1)/2)*2];
+        byte[] src_uv = new byte[width*height/4];
         int src_stride_y = width;
         int src_stride_uv = width+1;
         int argb_stride = width*4;
         byteBuffer.get(src_y,0,width*height);
         Log.e(TAG, "NV21ToARGB: " + src_uv.length);
         byteBuffer.position(width*height+1);
-        byteBuffer.get(src_uv,0,src_uv.length-1);
+        byteBuffer.get(src_uv,0,src_uv.length);
         byteBuffer.position(0);
         NV21ToARGB(src_y,src_stride_y,src_uv,src_stride_uv,argb,argb_stride,width,height);
+        Log.e(TAG, "NV21ToARGB:  ++++++++++" );
         return argb;
     }
 

@@ -1,12 +1,14 @@
 package com.chenli.media;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/30.
@@ -32,6 +35,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private Camera.Parameters parameters;
+    private static String currentPath;
 
     public CameraPreview(Context context) {
         super(context);
@@ -55,11 +59,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         parameters.setRotation(90);//这句话设置了保存的图片才是旋转后的。
 
         parameters.setPictureFormat(ImageFormat.JPEG);
+        parameters.setPreviewFormat(ImageFormat.NV21);
 
-        parameters.setPreviewFormat(ImageFormat.YV12);
-
-        parameters.setPictureSize(480,640);
-        parameters.setPreviewSize(480,640);
+        parameters.setPictureSize(640,480);
+        parameters.setPreviewSize(640,480);
         //这两个属性 如果这两个属性设置的和真实手机的不一样时，就会报错
 
         if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
@@ -76,7 +79,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera.setParameters(parameters);
         mCamera.setPreviewDisplay(holder);
         mCamera.startPreview();
-
 
     }
 
@@ -129,20 +131,25 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             String stringFromJNI = YUVlib.getStringFromJNI();
             Log.e(TAG, "onPreviewFrame: " + stringFromJNI);
 
-            int length = data.length;
-            Log.e(TAG, "length  " + length + " width = " + mCamera.getParameters().getPreviewSize().width + " height = " + mCamera.getParameters().getPreviewSize().height);
+            //int length = data.length;
+            //Log.e(TAG, "length  " + length + " width = " + mCamera.getParameters().getPreviewSize().width + " height = " + mCamera.getParameters().getPreviewSize().height);
 
             byte[] bytes = YUVlib.getInstance().NV21ToARGB(data, data.length, mCamera.getParameters().getPreviewSize().width, mCamera.getParameters().getPreviewSize().height);
-            try {
-                File takePicture = getTakePicture();
-                FileOutputStream fos = new FileOutputStream(takePicture);
-                Log.e(TAG, "onPreviewFrame: " + bytes.length);
-                fos.write(bytes);
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+
+
+//            try {
+//                File takePicture = getTakePicture();
+//                FileOutputStream fos = new FileOutputStream(takePicture);
+//                //Log.e(TAG, "onPreviewFrame: " + bytes.length);
+//                fos.write(data);
+//                fos.flush();
+//                fos.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+            //galleryAddPic();
 
 
             //YuvImage yuvImage = new YuvImage(data,ImageFormat.NV21,mCamera.getParameters().getPreviewSize().width,mCamera.getParameters().getPreviewSize().height,null);
@@ -159,12 +166,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     };
 
+
+    private void galleryAddPic(){
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getContext().sendBroadcast(mediaScanIntent);
+    }
+
     public static File getTakePicture() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMDD_HHmmss").format(new Date());
         String imageFileName = "JPEG_"+timeStamp + "_";
         File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName,".jpg",file);
-        //currentPath = "file:" + image.getAbsolutePath();
+        currentPath = "file:" + image.getAbsolutePath();
         return image;
     }
 
