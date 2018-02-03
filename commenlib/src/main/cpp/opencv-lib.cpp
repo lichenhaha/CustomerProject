@@ -142,6 +142,13 @@ Java_com_chenli_commenlib_jni_OpencvNative_dataTransition(JNIEnv *env, jobject i
                                                           jintArray pixels_, jint w, jint h) {
     jint *pixels = env->GetIntArrayElements(pixels_, NULL);
 
+
+//    LOGE("pixles0 = %x ", (jbyte*)pixels[0]);
+//    LOGE("pixles1 = %x" , (jbyte*)pixels[1]);
+//    LOGE("pixles2 = %x" , (jbyte*)pixels[2]);
+//    LOGE("pixles3 = %x" , (jbyte*)pixels[3]);
+
+
     Mat mat(h,w,CV_8UC4,pixels);
 
     LOGE("mat0 = %d " ,mat.at<Vec4b>(0,0)[0]);
@@ -184,6 +191,20 @@ Java_com_chenli_commenlib_jni_OpencvNative_filterPicture(JNIEnv *env, jobject in
     env->ReleaseIntArrayElements(pixels_, pixels, 0);
     return result;
 }
+
+
+
+
+//JNIEXPORT jintArray JNICALL
+//Java_com_chenli_commenlib_jni_OpencvNative_filterPicture(JNIEnv *env, jobject instance,
+//                                                         jintArray pixels_, jint w, jint h) {
+//    jint *pixels = env->GetIntArrayElements(pixels_, NULL);
+//
+//    // TODO
+//
+//    env->ReleaseIntArrayElements(pixels_, pixels, 0);
+//}
+
 
 JNIEXPORT jintArray JNICALL
 Java_com_chenli_commenlib_jni_OpencvNative_blurHalfPicture(JNIEnv *env, jobject instance,

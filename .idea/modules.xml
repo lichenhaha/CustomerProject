@@ -11,7 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/ounews/ounews.iml" filepath="$PROJECT_DIR$/ounews/ounews.iml" />
       <module fileurl="file://$PROJECT_DIR$/testdemo/testdemo.iml" filepath="$PROJECT_DIR$/testdemo/testdemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/yuvlib/yuvlib.iml" filepath="$PROJECT_DIR$/yuvlib/yuvlib.iml" />
-      <module fileurl="file://H:\AndroidStudio\CustomerProject\yuvlib\yuvlib.iml" filepath="H:\AndroidStudio\CustomerProject\yuvlib\yuvlib.iml" />
+      <module fileurl="file://H:/AndroidStudio/CustomerProject/yuvlib/yuvlib.iml" filepath="H:/AndroidStudio/CustomerProject/yuvlib/yuvlib.iml" />
     </modules>
   </component>
 </project>

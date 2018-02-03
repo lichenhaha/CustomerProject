@@ -24,7 +24,6 @@ public class OpencvNative {
 
     public native int[] blurHalfPicture(int[] pixels, int w, int h);
 
-
     static class OpencvNativeHelper{
         private static OpencvNative instance = new OpencvNative();
     }

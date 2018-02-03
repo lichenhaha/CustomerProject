@@ -3,6 +3,7 @@ package com.chenli.media;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -16,14 +17,19 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.chenli.commenlib.util.mainutil.LogUtils;
 import com.chenli.yuvlib.YUVlib;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static android.R.attr.bitmap;
 
 /**
  * Created by Administrator on 2018/1/30.
@@ -64,7 +70,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         parameters.setPictureSize(640,480);
         parameters.setPreviewSize(640,480);
         //这两个属性 如果这两个属性设置的和真实手机的不一样时，就会报错
-
         if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
             //竖屏
             parameters.set("orientation","portrait");
@@ -75,7 +80,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        mCamera.autoFocus(autoFocusCallback);
+        //有些手机不会自动调用聚焦回调方法，我测的小米手机就不会，只能采用点击一下屏幕聚焦。
+        //mCamera.autoFocus(autoFocusCallback);
         mCamera.setParameters(parameters);
         mCamera.setPreviewDisplay(holder);
         mCamera.startPreview();
@@ -128,41 +134,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera.PreviewCallback mCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            String stringFromJNI = YUVlib.getStringFromJNI();
-            Log.e(TAG, "onPreviewFrame: " + stringFromJNI);
+            int width = mCamera.getParameters().getPreviewSize().width;
+            int height = mCamera.getParameters().getPreviewSize().height;
+            byte[] bytes = YUVlib.getInstance().NV21ToARGB(data, width, height);
 
-            //int length = data.length;
-            //Log.e(TAG, "length  " + length + " width = " + mCamera.getParameters().getPreviewSize().width + " height = " + mCamera.getParameters().getPreviewSize().height);
+            Bitmap bitmap = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length).put(bytes);
+            byteBuffer.position(0);
+            bitmap.copyPixelsFromBuffer(byteBuffer);
 
-            byte[] bytes = YUVlib.getInstance().NV21ToARGB(data, data.length, mCamera.getParameters().getPreviewSize().width, mCamera.getParameters().getPreviewSize().height);
-
-
-
-//            try {
-//                File takePicture = getTakePicture();
-//                FileOutputStream fos = new FileOutputStream(takePicture);
-//                //Log.e(TAG, "onPreviewFrame: " + bytes.length);
-//                fos.write(data);
-//                fos.flush();
-//                fos.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-            //galleryAddPic();
-
-
-            //YuvImage yuvImage = new YuvImage(data,ImageFormat.NV21,mCamera.getParameters().getPreviewSize().width,mCamera.getParameters().getPreviewSize().height,null);
-//            try {
-//                File takePicture = getTakePicture();
-//                FileOutputStream fos = new FileOutputStream(takePicture);
-//                yuvImage.compressToJpeg(new Rect(0,0,mCamera.getParameters().getPreviewSize().width,mCamera.getParameters().getPreviewSize().height),100,fos);
-//                fos.flush();
-//                fos.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
+            try {
+                File takePicture = getTakePicture(".png");
+                FileOutputStream fos = new FileOutputStream(takePicture);
+                bitmap.compress(Bitmap.CompressFormat.PNG,100,fos);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -175,11 +162,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         getContext().sendBroadcast(mediaScanIntent);
     }
 
-    public static File getTakePicture() throws IOException {
+    public static File getTakePicture(String end) throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMDD_HHmmss").format(new Date());
         String imageFileName = "JPEG_"+timeStamp + "_";
         File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName,".jpg",file);
+        File image = File.createTempFile(imageFileName,end,file);
         currentPath = "file:" + image.getAbsolutePath();
         return image;
     }
@@ -189,7 +176,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             try {
-                File picture = getTakePicture();
+                File picture = getTakePicture(".jpg");
                 FileOutputStream fos = new FileOutputStream(picture);
                 fos.write(data);
                 fos.flush();

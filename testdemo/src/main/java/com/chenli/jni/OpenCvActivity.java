@@ -156,12 +156,12 @@ public class OpenCvActivity extends AppCompatActivity implements View.OnClickLis
             long end = System.currentTimeMillis();
             textView.setText("消耗时间:" + (end-current));
         }else if (v.getId() == R.id.button7){
-            Bitmap bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+            Bitmap bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888);
             int w = bitmap.getWidth();
             int h = bitmap.getHeight();
             for (int i = 0; i < h; i++) {
                 for (int j = 0; j < w; j++) {
-                    bitmap.setPixel(i,j, Color.parseColor("#FFFF0000"));
+                    bitmap.setPixel(i,j, Color.parseColor("#8899AABB"));
                 }
             }
             int[] pixels = new int[w*h];

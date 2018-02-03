@@ -18,8 +18,6 @@ import com.chenli.gameproject.gl.GlSurface2;
 public class SurfaceViewActivity extends AppCompatActivity {
     private GlSurface2 myGLSurfaceView;
 
-//    private MyGLSurfaceView myGLSurfaceView;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
