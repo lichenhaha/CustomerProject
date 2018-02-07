@@ -1,4 +1,4 @@
-package com.chenli.gameproject.newgl;
+package com.chenli.gameproject.util;
 
 import android.opengl.GLES20;
 
@@ -56,6 +56,14 @@ public class ShaderHelper {
             LogUtils.e("chenli", "linking of program failed");
             return 0;
         }
+        return program;
+    }
+
+    public static int buildProgram(String vertexShaderSource,String fragmentShaderSource){
+        int program ;
+        int vertexShader = compileVertexShader(vertexShaderSource);
+        int fragmentShader = compileFragmentShader(fragmentShaderSource);
+        program = linkProgram(vertexShader, fragmentShader);
         return program;
     }
 

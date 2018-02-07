@@ -1,28 +1,27 @@
-package com.chenli.gameproject.gl;
+package com.chenli.gameproject.newgl;
 
 import android.content.Context;
-import android.content.UriMatcher;
 import android.opengl.GLES20;
 
+import com.chenli.gameproject.R;
+import com.chenli.gameproject.util.ShaderProgram;
+
 /**
- * Created by Administrator on 2018/1/26.
+ * Created by Administrator on 2018/2/4.
  */
 
 public class TextureShaderProgram extends ShaderProgram {
+    private final int uMatrixLocation;
+    private final int uTextureUnitLocation;
+    private final int aPositionLocation;
+    private final int aTextureCoordinatesLocation;
 
-    private int uMatrixLocation;
-    private int uTextureUnitLocation;
-    private int aPositionLocation;
-    private int aTextureCoordinatesLocation;
-
-    public TextureShaderProgram(Context context, int vertexShaderResourceId, int fragmentShaderResourceId) {
-        super(context, vertexShaderResourceId, fragmentShaderResourceId);
-        uMatrixLocation = GLES20.glGetUniformLocation(program, U_MATRIX);
-        uTextureUnitLocation = GLES20.glGetUniformLocation(program,U_TEXTURE_UNIT);
-
+    protected TextureShaderProgram(Context context) {
+        super(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
+        uMatrixLocation = GLES20.glGetUniformLocation(program,U_MATRIX);
         aPositionLocation = GLES20.glGetAttribLocation(program,A_POSITION);
+        uTextureUnitLocation = GLES20.glGetUniformLocation(program,U_TEXTURE_UNIT);
         aTextureCoordinatesLocation = GLES20.glGetAttribLocation(program,A_TEXTURE_COORDINATES);
-
     }
 
     public void setUniforms(float[] matrix, int textureId){
@@ -36,7 +35,7 @@ public class TextureShaderProgram extends ShaderProgram {
         return aPositionLocation;
     }
 
-    public int getaTextureCoordinatesAttributeLocation(){
+    public int getTextureCoordinatesAttributeLocation(){
         return aTextureCoordinatesLocation;
     }
 

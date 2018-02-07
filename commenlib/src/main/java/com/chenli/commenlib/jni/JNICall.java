@@ -1,6 +1,8 @@
 package com.chenli.commenlib.jni;
 
 
+import android.util.Log;
+
 import com.chenli.commenlib.util.mainutil.LogUtils;
 
 /**
@@ -10,12 +12,12 @@ import com.chenli.commenlib.util.mainutil.LogUtils;
 public class JNICall {
 
     public static final int TEST_BUFFER_SIZE = 128;
+    private static final String TAG = "chenli";
     private byte[] mTestBuffer1;
     private byte[] mTestbuffer2;
 
     static {
         System.loadLibrary("ffmpeg");
-        System.loadLibrary("test-lib");
         System.loadLibrary("native-lib");
     }
 
@@ -49,6 +51,11 @@ public class JNICall {
 
     public native void getMediaInfo(String srcPath);
 
+    public native void callPthread();
+
+    private static void fromJNI(int i){
+        Log.e(TAG, " java------------> " + i );
+    }
 
     public void test(){
         nativeSetBuffer1(mTestBuffer1,TEST_BUFFER_SIZE);

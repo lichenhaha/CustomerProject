@@ -34,9 +34,9 @@ public class TextureHelper {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR_MIPMAP_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
-        bitmap.recycle();
         //生成所有必要的级别
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+        bitmap.recycle();
         //纹理加载完成，解除绑定,0表示解绑
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
         return textureIds[0];

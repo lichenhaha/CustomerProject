@@ -2,7 +2,10 @@ package com.chenli.commenlib.util.gameutil;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.util.Log;
 
 import com.chenli.commenlib.util.mainutil.CloseUtils;
@@ -37,7 +40,7 @@ public class ShaderUtils {
             int[] params = new int[1];
             GLES20.glGetShaderiv(shader,GLES20.GL_COMPILE_STATUS,params,0);
             if (params[0] == 0){
-                LogUtils.e("hangce","Could not compile shader " + shaderType + " : " + GLES20.glGetShaderInfoLog(shader));
+                Log.e("chenli","Could not compile shader " + shaderType + " : " + GLES20.glGetShaderInfoLog(shader));
                 GLES20.glDeleteShader(shader);
                 shader = 0 ;
             }
@@ -75,10 +78,10 @@ public class ShaderUtils {
         if (program != 0){
             //向程序中加入顶点着色器
             GLES20.glAttachShader(program,vertexShader);
-            checkGlError("glAttachShader");
+            //checkGlError("glAttachShader");
             //向程序中加入片元着色器
             GLES20.glAttachShader(program, pixelShader);
-            checkGlError("glAttachShader");
+            //checkGlError("glAttachShader");
             //连接程序
             GLES20.glLinkProgram(program);
             //存放链接成功program数量的数组
@@ -87,7 +90,7 @@ public class ShaderUtils {
             GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS,linkStatus,0);
             //若链接失败则报错并删除程序
             if (linkStatus[0] != GLES20.GL_TRUE) {
-                LogUtils.e("hangce","Could not link program: " + GLES20.glGetProgramInfoLog(program));
+                LogUtils.e("chenli","Could not link program: " + GLES20.glGetProgramInfoLog(program));
                 GLES20.glDeleteProgram(program);
                 program = 0;
             }
@@ -138,6 +141,7 @@ public class ShaderUtils {
         try {
             while ((line = bufferedReader.readLine()) != null){
                 body.append(line);
+                body.append("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -170,6 +174,37 @@ public class ShaderUtils {
             result = result.replace("\\r\\n","\n");
         }catch (Exception e){
             e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    public static int[] loadTexture(Bitmap bitmap){
+        int[] textureId = new int[1];
+        //生成一个纹理
+        GLES20.glGenTextures(1,textureId,0);
+        int[] result = null;
+        if (textureId[0] != 0){
+            result = new int[3];
+            result[0] = textureId[0];
+            result[1] = bitmap.getWidth();
+            result[2] = bitmap.getHeight();
+            //bind to the texture in opengl
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textureId[0]);
+            //set filtering
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER
+                    ,GLES20.GL_LINEAR_MIPMAP_LINEAR);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_WRAP_S,GLES20.GL_REPEAT);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_WRAP_T,GLES20.GL_REPEAT);
+            //让图片和纹理关联起来，加载到OpenGl空间中
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
+            bitmap.recycle();
+            //纹理加载完成，解除绑定,0表示解绑
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+            //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
+        }else {
+            throw new RuntimeException("Error loading texture");
         }
         return result;
     }

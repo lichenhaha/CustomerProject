@@ -185,7 +185,9 @@ public class JNIActivity extends AppCompatActivity {
         button9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textview2.setText(JNICall.getStringFormatInfo());
+                JNICall call = new JNICall();
+
+                call.callPthread();
             }
         });
 
