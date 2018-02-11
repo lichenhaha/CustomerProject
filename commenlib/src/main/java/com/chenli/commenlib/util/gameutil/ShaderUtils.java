@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLES11;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
@@ -195,18 +197,31 @@ public class ShaderUtils {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER
                     ,GLES20.GL_LINEAR_MIPMAP_LINEAR);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_WRAP_S,GLES20.GL_REPEAT);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_WRAP_T,GLES20.GL_REPEAT);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_WRAP_S,GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_WRAP_T,GLES20.GL_CLAMP_TO_EDGE);
             //让图片和纹理关联起来，加载到OpenGl空间中
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
             bitmap.recycle();
             //纹理加载完成，解除绑定,0表示解绑
             GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
-            //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
         }else {
             throw new RuntimeException("Error loading texture");
         }
         return result;
+    }
+
+    public static int createTextureID(){
+        int[] texture = new int[1];
+        GLES20.glGenTextures(1,texture,0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture[0]);
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_LINEAR_MIPMAP_LINEAR);
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
+                GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,GLES20.GL_TEXTURE_WRAP_S,GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,GLES20.GL_TEXTURE_WRAP_T,GLES20.GL_CLAMP_TO_EDGE);
+        return texture[0];
     }
 
 }

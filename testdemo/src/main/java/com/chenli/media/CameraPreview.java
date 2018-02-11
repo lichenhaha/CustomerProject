@@ -62,7 +62,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);//启动后置摄像头
         parameters = mCamera.getParameters();
         mCamera.setDisplayOrientation(90);//只是设置预览方向，拍照后的图片还是横向的。
-        parameters.setRotation(90);//这句话设置了保存的图片才是旋转后的。
 
         parameters.setPictureFormat(ImageFormat.JPEG);
         parameters.setPreviewFormat(ImageFormat.NV21);
@@ -84,11 +83,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //mCamera.autoFocus(autoFocusCallback);
         mCamera.setParameters(parameters);
         mCamera.setPreviewDisplay(holder);
+
         mCamera.startPreview();
 
     }
 
-    private void releaseCamera() {
+    public void releaseCamera() {
         if (mCamera != null){
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();

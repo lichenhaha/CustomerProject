@@ -36,9 +36,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     Button button2;
     @Bind(R.id.button3)
     Button button3;
+    @Bind(R.id.button4)
+    Button button4;
     @Bind(R.id.framelayout)
     FrameLayout framelayout;
     private CameraPreview cameraPreview;
+    private CameraTexturePreview preview;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,6 +52,19 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
+        button4.setOnClickListener(this);
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (preview != null && preview.isOpaque()){
+            preview.releaseCamera();
+            framelayout.removeAllViews();
+        }else {
+            super.onBackPressed();
+        }
 
     }
 
@@ -78,6 +94,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else if (v.getId() == R.id.button4){
+//            preview = new CameraTexturePreview(this);
+//            framelayout.removeAllViews();
+//            framelayout.addView(preview);
+
+            CameraPreviewByGL cameraPreviewByGL = new CameraPreviewByGL(this);
+            framelayout.removeAllViews();
+            framelayout.addView(cameraPreviewByGL);
+
         }
 
     }

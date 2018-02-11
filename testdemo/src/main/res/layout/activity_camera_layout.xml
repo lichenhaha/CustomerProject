@@ -20,6 +20,11 @@
         android:text="button3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/button4"
+        android:text="button4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <FrameLayout
         android:id="@+id/framelayout"

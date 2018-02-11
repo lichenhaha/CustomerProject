@@ -3,6 +3,8 @@ package com.chenli.gameproject.demo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.SurfaceTexture;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -28,7 +30,6 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
     float[] mViewMatrix = new float[16];
     float[] mMVPMatrix = new float[16];
 
-
     private final float[] sPos = {
             -0.5f, 0.5f,
             0.5f,  0.5f  ,
@@ -42,7 +43,6 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
             1.0f, 1f,
             0f, 1f
     };
-    private final Bitmap bitmap;
     private FloatBuffer vertex;
     private FloatBuffer index;
     private int program;
@@ -52,13 +52,11 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
     private int uniformTexture;
     private int vMatrix;
 
-
     public TexturePicture1(Context context) {
         super(context);
         setEGLContextClientVersion(2);
         setRenderer(this);
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
     }
 
     @Override
@@ -67,7 +65,6 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-
         loadVertex();
         initShader();
     }
@@ -86,10 +83,8 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
     private void initShader() {
         String vertexSource = ShaderUtils.readTextFileFromResource(getContext(), R.raw.vertexshader);
         String fragmentSource = ShaderUtils.readTextFileFromResource(getContext(),R.raw.fragmentshader);
-
         program = ShaderUtils.createProgram(vertexSource, fragmentSource);
         GLES20.glUseProgram(program);
-
         attribPosition = GLES20.glGetAttribLocation(program, "a_position");
         attribTexCoord = GLES20.glGetAttribLocation(program, "a_texCoord");
         uniformTexture = GLES20.glGetUniformLocation(program, "u_samplerTexture");
@@ -140,10 +135,11 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
 //        }
 //        //设置相机位置
 //        Matrix.setLookAtM(mViewMatrix,0,0,0,7.0f,0,0,0,0,1.0f,0.0f);
-//        //计算变换矩阵
+////        //计算变换矩阵
 //        Matrix.multiplyMM(mMVPMatrix,0,mProjectMatrix,0,mViewMatrix,0);
 
         float aspectRatio = width>height?width*1.0f/height:height*1.0f/width;
+        Matrix.setRotateM(mProjectMatrix,0,30,0,0,1);
         if (width > height){
             Matrix.orthoM(mProjectMatrix,0,-aspectRatio,aspectRatio,-1,1,-1,1);
         }else {
@@ -156,7 +152,7 @@ public class TexturePicture1 extends GLSurfaceView implements GLSurfaceView.Rend
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
 
         GLES20.glUniformMatrix4fv(vMatrix,1,false,mProjectMatrix,0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN,0,4);
 
     }
 }

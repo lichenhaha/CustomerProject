@@ -110,4 +110,9 @@ dependencies {
     //加载gif动画 ,基于giflib
     //compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.10'
 
+
+    compile 'com.github.chrisbanes:PhotoView:2.1.3'
+
+    compile 'com.bm.photoview:library:1.4.1'
+
 }
